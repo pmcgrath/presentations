@@ -64,6 +64,7 @@ AMQP concepts
 			Headers
 	Queues
 	Bindings
+	Connection and channel lifetimes
 
 	
 Patterns
@@ -80,3 +81,10 @@ Libraries
 	C\		- low level driver, easynetq, nservicebus, masstransit
 	Java	- low level driver
 
+
+Usage
+	git log
+	
+	./compile.ps1
+	./producer.exe
+	
