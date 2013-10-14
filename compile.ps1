@@ -1,0 +1,1 @@
+csc producer.cs /r:rabbitmq.client.dll
