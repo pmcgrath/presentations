@@ -7,6 +7,7 @@ History
 	Book						http://www.manning.com/videla/
 	Alternatives
 		MQSeries
+		Qpid
 		Mule
 		ZeroMQ
 		Redis queues
@@ -121,3 +122,8 @@ Usage
 Curl publication in powershell - escaping is terrible
 	curl -i -u guest:guest -H "content-type:application/json" -d '{ \"properties\": { }, \"routing_key\": \"\", \"payload\": \"From curl\", \"payload_encoding\": \"string\" }' -X POST http://localhost:15672/api/exchanges/%2f/demo_exchange/publish
 
+
+	
+Place on github
+	Billy ktug single repository
+	
