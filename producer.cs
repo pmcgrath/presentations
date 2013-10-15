@@ -13,6 +13,9 @@ class App
 	
 		var _connectionFactory = new ConnectionFactory();
 		var _connection = _connectionFactory.CreateConnection();
+		
+		Console.WriteLine("Hit enter to create the channel");
+		Console.ReadLine();
 		var _channel = _connection.CreateModel();
 
 		Console.WriteLine("Hit enter to declare exchange");
@@ -27,7 +30,6 @@ class App
 		Console.ReadLine();
 		_channel.QueueBind(_queueName, _exchangeName, string.Empty, null);
 		
-
 		do
 		{
 			var _messageProperties = _channel.CreateBasicProperties();
