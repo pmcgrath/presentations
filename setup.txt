@@ -14,12 +14,16 @@ RabbitMQ
 	
 
 Software
-	erlang				http://www.erlang.org/download.html
-	git					http://git-scm.com/download/win
-	ruby				http://rubyinstaller.org/downloads/
-	notepad++			http://notepad-plus-plus.org/download/v6.5.html
-	rabbitmq			http://www.rabbitmq.com/install-windows-manual.html
-
+	erlang						http://www.erlang.org/download.html
+	git							http://git-scm.com/download/win
+	ruby						http://rubyinstaller.org/downloads/
+		bundler gem				
+		bunny gem				http://rubygems.org/gems/bunny
+	notepad++					http://notepad-plus-plus.org/download/v6.5.html
+	rabbitmq					http://www.rabbitmq.com/install-windows-manual.html
+	.NET				
+		RabbitMQ c# driver
+	
 	
 Environment variables - run as an damin with an elevated shell, only needs to happen once
 	[Environment]::SetEnvironmentVariable('ERLANG_HOME', 'c:\utilities\erl5.10.3', 'Machine');
@@ -33,6 +37,11 @@ Windows path
 Powershell profile
 	set-executionpolicy remotesigned
 	See profile_include.ps1
+	
+	
+Ruby
+	gem install bundler
+	bundle
 	
 	
 RabbitMQ
