@@ -1,0 +1,137 @@
+Context
+	Made available by google in 2009
+		Rob Pike - Unix guy, lots of oses and languages 
+		Ken Thompson - Along with Dennis Ritchie is the father of unix, created b language which is a predessor to c
+		Brad Fitzpatrick - Creator of memcached, lots of work that has created standard lib packages	
+	Originally was designed to be a systems programming language to replace c++ with much shorter build times
+	Compiles and builds into a single executable
+	Procedural language
+	It is a statically-typed language with syntax loosely derived from C, includes garbage collection, type safety and some dynamic-typing capabilities
+		no type inheritance
+		no method or operator overloading
+		no pointer arithmetic
+		no generic programming
+	Concurrency based on Tony Hoare's Communicating Sequential Processes (CSP)
+		go routines
+			Threads of execution managed by go, not equivalent of os threads more like erlang processes
+		channels
+			Synchronisation mechanism
+			Non buffered - synchronised and blocking
+			Buffered - producer will only block on sending if channel full, consumer will only block on receieve if channel empty
+	Available for most unixes 
+		Available on windows, which was made possible by the community, part of official release
+	Turns out a lot of ruby and python developers are intrested which the go team did not expect
+	Is in the adapt section of the July 2014 thoughtworks tech radar
+	
+
+Who is using it
+	Google - parts of youtube
+	Docker.io
+	Dropbox
+	CloudFlare
+	SoundCloud
+	BBC
+
+
+Installtion instructions
+	See http://golang.org/doc/install
+	install.sh
+		wget archive
+ 		Extract archive content to /usr/local/go
+         	Add /usr/local/go/bin to path - either system wide or just for current user
+	Can install multiple versions
+		Can use a tool gvm https://github.com/moovweb/gvm to manage multiple versions like rvm for ruby
+		Or manage environment variables yourself
+	Demo local setup
+		echo $PATH | tr ':' '\n' | sort
+		which go
+		go version
+		go env
+	Workspace
+		Not needed for now if only running go run app.go
+		If setting up, should use one global workspace, but can use multiple, problems with go get
+			Ensure ~/go directory exists for current user
+  			Ensure GOPATH environment variable exists for current user
+ 			Ensure ~/go/bin is on path for current user
+
+
+My dev environment 
+	Not using an IDE, there is one - LiteIDE 
+	Using some vim plugins for syntax highlighting and auto running go fmt on buffer write
+	Since we do not have a repl can use go playground to test snippets
+
+
+Tip
+	When searching for content use the term "golang" everywhere
+	Go standard library source code - Usefull for grepping
+		Will need mercurial
+		hg clone -u release https://code.google.com/p/go
+		cd go/src/pkg
+		grep 'func NewLogger(' *.go -r .
+
+go tool
+	Highlight some
+		go version
+		go get
+		go build
+		go run
+		go test
+
+
+Highlights
+	Packages
+		One with package main - executables
+		One with package other - packages that can be linked into a main package
+		Build results in a single binary - compile and link
+		Third party s/w is via packages with go get
+			Will need git, mercurial and other scm tools installed for this
+			Versioning - vendoring	
+	Testing
+	No classes
+	Structs
+	Functions
+	Methods
+	Looping - Single for
+	Slices\arrays and maps
+	Error handling
+	Channels
+	go routines
+	Closures
+
+
+Funny
+	Mutation - global and package level
+	Visibility
+	Error handling
+	Generics
+	List comprehensions - LINQ
+	Package dependency management - using many tools for vendoring - no clear winner
+	Dynamic code loading - plugins - can do so using shell processes
+	Language elegance - compared to clojure, lots of low level manipulation
+	Android - Attempting some jvm interop	
+	UI apps - some oss for this
+
+
+Code sample order
+	hello.go
+	helloname.go
+	test/			- Has failing test
+	dependency/		- Has failing text
+	hellostruct.go
+	goroutines.go
+	channels.go
+	webserver.go
+	contacts/*	
+
+
+Resources
+	http://golang.org/				- Home
+	http://golang.org/doc/effective_go.html		- Syntax etc - A must read !
+	http://golang.org/doc/code.html			- Code organisation
+	http://tour.golang.org/#1 			- Tour of go - interactive language tour
+	http://play.golang.org 				- Can use instead of a repl, has some limitations and can share code
+	http://www.youtube.com/watch?v=XCsL89YtqCs 	- Fast summary of app creation and testing
+	http://dave.cheney.net/				- Very good blog
+	https://code.google.com/p/go-wiki/wiki/Projects - Third party packages, read the source
+
+

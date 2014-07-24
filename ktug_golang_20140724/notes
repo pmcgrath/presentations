@@ -1,0 +1,211 @@
+Code sample order
+	hello.go
+	helloname.go
+	hellostruct.go
+	goroutines.go
+	channels.go
+	webserver.go
+	contacts/*	
+
+Installtion instructions
+	See http://golang.org/doc/install
+	install.sh
+	Can install multiple versions
+		Can use a tool gvm https://github.com/moovweb/gvm to manage multiple versions like rvm for ruby
+		Alter PATH
+
+Source code - Usefull for greeping
+	Will need mercurial
+	See http://golang.org/doc/install/source
+		hg clone -u release https://code.google.com/p/go
+	To see current branch : hg branch
+	To see all branches : hg branches
+	To switch to default branch (master) : hg update -C default 
+	To switch to current version of go (1.3) : hg update -C release-branch.go1.3
+
+Tour of go - interactive language tour
+	http://tour.golang.org/#1
+	http://play.golang.org - Can use instead of a repl, has some limitations and can share code
+
+Fast summary of app creation and testing
+	http://www.youtube.com/watch?v=XCsL89YtqCs
+
+Test installation
+	which go
+	go version
+	go env
+
+cli documentation
+	godoc fmt Println
+	godoc -src net			# This will give you the package source
+
+Run local documentation server
+	godoc -http=:6060 &
+	xdg-open  http://localhost:6060 &	# Still relies on internet for some content and search does not seem to work, but all content can be browsed
+
+Getting started - structure
+	http://golang.org/doc/code.html
+	http://golang.org/doc/effective_go.html
+
+Context
+	Made available by google in 2009
+		Rob Pike, Ken Thompson
+	Originally was designed to be a systems programming language to replace c++ with much shorter build times
+	Compiles and builds into a single executable
+	Procedural language
+	Concurrency based on Tony Hoare's Communicating Sequential Processes (CSP)
+	It is a statically-typed language with syntax loosely derived from C, includes garbage collection, type safety and some dynamic-typing capabilities
+
+Dependencies
+	Need scm s/w as go get uses these (git, Mercurial, Subversion and Bazzar)
+		# git - needed for github code
+		sudo add-apt-repository ppa:git-core/ppa
+		sudo apt-get update
+		sudo apt-get install git
+
+		# Mercurial - needed for lots of code.google.com dependencies
+		sudo apt-get install mercurial
+
+	Update a particular package
+		go get -u github.com/tools/godep
+
+	List all packages
+		go list all
+
+	Versioning
+		See http://dave.cheney.net/2014/03/22/thoughts-on-go-package-management-six-months-on
+
+Working example
+	http://nathany.com/good/
+
+Channels
+	http://guzalexander.com/2013/12/06/golang-channels-tutorial.html
+
+Missing
+	Error handling
+	Generics
+	https://gobyexample.com/collection-functions
+	Dynamic code loading - plugins - can do so using shell processes
+	UI apps - some oss for this
+
+Highlights
+	Two types of packages
+		Programs
+			A complete program is created by linking a single, unimported package called the main package with all the packages it imports, transitively. The main package must have package name main and declare a function main that takes no arguments and returns no value. func main() { … }
+			Program execution begins by initializing the main package and then invoking the function main. When that function invocation returns, the program exits. It does not wait for other (non-main) goroutines to complete.
+		Library packages
+			These contain functionality that can be imported into other packages		
+	go build process
+		Produces statically linked native binaries without external dependencies
+			Can even to cross compiling http://dave.cheney.net/2013/07/09/an-introduction-to-cross-compilation-with-go-1-1
+		See http://golang.org/cmd/go/
+		Demo
+			echo -e "package main\nimport \"fmt\"\nfunc main() {\n fmt.Println(\"ted\")\n}\n" > b.go
+			go run b.go
+			file b
+			ldd b
+			readelf -l b
+			ldd /bin/ls
+			echo -e "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n)\n\nfunc helloHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"Hello World from Go\")\n}\n\nfunc main() {\n\thttp.HandleFunc(\"/\", helloHandler)\n\terr := http.ListenAndServe(\":8080\", nil)\n\tif err != nil {\n\t\tpanic(\"ListenAndServe: \" + err.Error())\n\t}\n}\n" > webapp.go
+			go build webapp.go
+			readelf -l webapp
+			ldd webapp.go
+				These are dynamic
+				See http://blog.xebia.com/2014/07/04/create-the-smallest-possible-docker-container/
+		go run
+			Creates a temp file, can see this by using import "os" and fmt.Println(OS.Args[0])
+		go build
+			Verifies everything is okay and creates a local executable for program packages
+		go install
+			go env
+				GOPATH	- Can have multiples but discouraged
+				GOOS
+				GOARCH
+			Workspace
+				bin
+					executables from go install\get
+				src
+					source code
+				pkg
+					Linkable object files for packages, this is why we have fast builds - if no changes
+				
+	structs
+		Collection of fields
+		Fields can be anything including functions
+		Creation
+			The expression new(T) allocates a zeroed T value and returns a pointer to it
+		Export/visibility
+		Embedding
+
+	functions
+		First class
+		Parameters - multiple parameters with same type, paramarrays
+		Multiple return values
+		Named results
+
+	closures
+	
+	vars
+		var ted string = "Ted"
+		Can use := within functions for type inference
+
+	Looping
+		Only have for
+			for i := 0; i < 10; i++ { }
+			for {}					# Infinite
+			for i < 100 { }				# While
+
+	Arrays
+		myArray := [3]int
+		myArray := [3]int { 1, 2 }
+
+	Slices
+		mySlice := []int { 1, 2 }
+			mySlice = append(mySlice, 3)
+		a := make([]int, 5)  // len(a)=5
+		pointer to array underneath
+		Taking slices of a slice
+			mySlice[1:2]
+			mySlice[1:]
+		Memory implications
+		Passing to functions ??	
+		range
+
+	maps
+	
+	Pointers
+
+
+Why we use go
+	https://blog.splice.com/golang-improved-simplicity-reduced-maintenance/
+	http://andlabs.lostsig.com/blog/2014/06/30/85/an-introduction-to-pointers-for-go-programmers-not-coming-from-c-family-languages
+	http://www.infoq.com/news/2014/06/golang-google-android-native-dev
+	http://www.golang-book.com/
+	http://jordanorelli.com/post/42369331748/function-types-in-go-golang
+
+	http://en.wikipedia.org/wiki/Go_(programming_language)
+	http://www.reddit.com/r/golang/
+	http://golanggo.com/
+	https://gobyexample.com/
+	http://dave.cheney.net/
+	http://golangtutorials.blogspot.ie/2011/05/table-of-contents.html
+
+	http://www.goinggo.net/
+	https://github.com/rcrowley
+	https://github.com/inconshreveable/ngrok
+
+	https://github.com/rcrowley/go-tigertonic
+
+	https://github.com/StefanSchroeder/Golang-Regex-Tutorial
+	https://github.com/astaxie/build-web-application-with-golang/tree/master/en
+	https://gowalker.org/
+	http://play.golang.org
+
+
+
+no repl - use playground, can share, has some limitations
+gc explanation
+
+
+
+
