@@ -115,7 +115,7 @@ Funny
 Code sample order
 	hello.go
 	helloname.go
-	test/			- Has failing test
+	testing/		- Has failing test
 	dependency/		- Has failing text
 	hellostruct.go
 	goroutines.go
