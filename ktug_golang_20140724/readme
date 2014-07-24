@@ -76,6 +76,7 @@ go tool
 		go build
 		go run
 		go test
+		go fmt
 
 
 Highlights
@@ -133,5 +134,6 @@ Resources
 	http://www.youtube.com/watch?v=XCsL89YtqCs 	- Fast summary of app creation and testing
 	http://dave.cheney.net/				- Very good blog
 	https://code.google.com/p/go-wiki/wiki/Projects - Third party packages, read the source
+	http://www.golang-book.com/			- Online book
 
 
