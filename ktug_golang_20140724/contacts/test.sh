@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 echo *** Root
 curl http://localhost:8080/ -v 
 
@@ -27,5 +28,10 @@ curl http://localhost:8080/contacts/ -v -XPOST -d '{ "forename": "Ted", "surname
 curl http://localhost:8080/contacts/ -v -XPOST -d '{ "forename": "Ted", "surname": "Toe" }'
 curl http://localhost:8080/contacts/ -v
 
-
+echo *** Adding a bunch of contacts
+for number in `seq 100`
+do
+	curl http://localhost:8080/contacts/ -v -XPOST -d "{ \"forename\": \"Ted\", \"surname\": \"Surname_$number\" }"
+done  
+curl http://localhost:8080/contacts/ -v
 
