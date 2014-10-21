@@ -61,8 +61,8 @@ install-go()
 
 	# Get binary content
 	archive=go$version.linux-amd64.tar.gz
-	#wget http://golang.org/dl/$archive
-	#sudo tar -C /usr/local -xzf $archive
+	wget http://golang.org/dl/$archive
+	sudo tar -C /usr/local -xzf $archive
 
 	# Place on path if not already on path
 	local profile=$HOME/.bashrc	
