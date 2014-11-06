@@ -1,0 +1,5 @@
+# Ignore local log directory if it exists
+log
+
+# Ignore run.sh as is used on the host and not within the container, so therefore should not be part of the build context
+run.sh

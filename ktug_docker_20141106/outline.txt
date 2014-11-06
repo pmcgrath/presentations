@@ -1,0 +1,277 @@
+Content
+	What is docker
+	VMs
+	Container virtualization
+	What does docker add
+	So how do we get one of these containers running
+	Run a container based on a Dockerfile
+	Share a deployment image via the Docker Hub registry
+	Run a mono app in a container
+	Volumes
+	Networking
+	Docker on bare metal
+	Multi host management
+	Sample use cases
+	Some links to start with
+	Q&A
+
+
+What is docker ? [https://www.docker.com/whatisdocker/]
+	Docker is a platform for building, shipping and running applications in a consistently isolated environment
+
+
+Lets start with something we are familiar with, how is this different from virtual machines ?
+	Historically how did we get to VMs [http://intelstudios.edgesuite.net/idf/2014/sf/aep/DATS004/DATS004.html]
+		Mainframes
+		PCs
+		Client\Server and multi-tier on physical machines
+		Consolidation of physical machines with VMs
+	VM image [docker_vms.png]
+		+ Allowed heterogeneous application stacks to run on same physical h/w, emulating h/w for each VM
+		+ Strong isolation between VMs
+		+ Live migrations, high availability and resource pooling
+		+ Utilization
+		- Each VM is a complete stack (OS, application stacks and applications) 
+		- Each VM instance needs managing - patches to full stack
+		- Perf overhead when compared to bare metal
+	Docker image [docker_containers.png] ** Describes docker on Linux using cgroups and namespaces
+
+
+What are these containers
+	Prior implementations [http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations]
+		Solaris zone
+		FreeBSD jails
+		OpenVZ
+	Docker plans on supporting a variety of containers
+		Linux containers - cgroups\namespaces
+		Possibly full VMs
+		MS containers [http://weblogs.asp.net/scottgu/docker-and-microsoft-integrating-docker-with-windows-server-and-microsoft-azure]
+	In docker today we usually mean operating system level virtualization [http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization]
+		Linux kernel and distributions ? Do we have a high level understanding
+		Process isolation
+			Single kernel shared by all running containers
+			Control groups - cgroup
+				Google worked on Linux cgroups to constrain and track resource usage for the process [http://en.wikipedia.org/wiki/Cgroups]
+					i.e CPU, CPUSets, Memory, IO
+					Describe the creation of 2 containers with limits - memory, cpusets [docker_cgroups.png]
+			Namespace isolation - namespaces
+				Namespaces are a kernel feature that allow isolating process environments (Views) [http://lwn.net/Articles/531114/]
+					i.e. Mounts, PID, MTS (hostname), Users, Networking
+					Merge the creation of the 2 containers above with namespaces [docker_namespaces_mounts.png]
+		LXC
+			User space tools for managing cgroups and namespaces
+			Docker started as a wrapper around lxc
+		Switched to libcontainer which default on Linux is an interface over cgroups and namespaces [http://www.infoworld.com/article/2607966/application-virtualization/4-reasons-why-docker-s-libcontainer-is-a-big-deal.html]
+	Back to containers diagram [docker_containers.png]
+		+ Improved startups when compare to VMs (Doing less)
+		+ Contains all s/w artifacts need to run the container within a unit
+		+ Lower overhead than VMs (No h/w emulation)
+ 		- Complexity - configuration, immaturity, management tools
+		- Weaker security isolation compare to VMs [https://medium.com/@fun_cuddles/docker-breakout-exploit-analysis-a274fff0e6b3]
+		- Linux only at this time
+				
+
+What does docker add
+	Docker is a much more pleasant interface for leveraging containers which mort can be happy with
+	Has managed to get people to start working on a common standard based effort on using container based solutions
+		Conversations between the big ones - Google, AWS, Rackspace, VMWare, reddhat, OpenStack, IBM, Microsoft etc
+	Additional features over Linux containers (These are very significant for s/w distribution)
+		Images
+			Template\blueprint of environment for running a process
+			Encourages running a single process within a container (No init pid 1)
+			Images can be build in two ways
+				a) Manually
+					Start with a base image
+					Run an instance of this image, this is a container
+					Do some work on the container preparing for running the process
+					Commit the container which creates a new layer on top of the last image, this is now an image itself
+				b) Dockerfile [http://docs.docker.com/reference/builder/]
+					DSL for building images
+					Describe the above in a single file through a serious of instructions
+						FROM ubuntu:14.04
+						MAINTAINER ted
+						RUN apt-get update
+						RUN apt-get install -y apache2
+						ENV APACHE_RUN_USER www-data
+						ENV APACHE_RUN_GROUP www-data
+						ENV APACHE_LOG_DIR /var/log/apache2
+						EXPOSE 80
+						CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+					Result is [docker_apache_image_layers.png]						
+					This is the recomended way to build images, this is SCM friendly and repeatable
+			Image layers [https://docs.docker.com/terms/layer/] [docker_image_layers.png]
+				Each instruction runs an instance of the image, the instruction is then execute in the container before it is stopped and the image is saved
+				Copy on write file system helps with this
+				Like subversion SCM's diffs
+			Images are immutable
+			Local cache
+		Registries
+			A service that stores images
+				Can push an image up to a registry
+				Can pull the exact image down on another machine and then run
+			Supports the distribution of s/w
+			Can use public registries, default is Docker Hub
+				Docker Hub [http://docs.docker.com/userguide/dockerrepos/]
+				Quay.io [https://quay.io/]
+
+				Can pay for private repositories in these registries
+				These also support webhooks for automated builds etc
+			Can run your own private registry 
+		Repositories [http://docs.docker.com/docker-hub/repos/]
+			On Docker Hub can have 2 types official and normal repositories	
+			i.e pmcgrath/myapp:v1.0
+				User
+				Repository
+				Tag
+			
+
+So how do we get one of these containers running
+	Install docker [https://docs.docker.com/]
+		Select from Installation menu list for your OS
+		On windows and OS X you can use boot2docker, you are interacting with a VM which is the docker host
+		On ubuntu [https://docs.docker.com/installation/ubuntulinux/]
+			# Connect to AWS instance
+			ssh -i .aws/pmcg_aws.pem ubuntu@ec2-54-172-65-200.compute-1.amazonaws.com
+			# Install
+			curl -sSL https://get.docker.com/ubuntu/ | sudo sh
+			# Try to use docker - fails due to permission issue
+			docker images
+			# Add current user to docker group - This is a potential security issue
+			sudo gpasswd -a ${USER} docker
+			# Exit so we can re-connect being part of the group
+			exit
+			# Re-connect to AWS instance
+			ssh -i .aws/pmcg_aws.pem ubuntu@ec2-54-172-65-200.compute-1.amazonaws.com
+			# Run docker commands - Success
+			docker images
+			docker info		# Number of images and containers
+			docker version		# golang dependency
+	Docker installation components
+		Docker engine daemon
+		Docker client
+		Empty local cache - docker info showed this
+	Run our first container - Interactively
+		Will need an image
+			Search
+				docker search ubuntu
+			Getting our first image
+				docker images			# Empty local cache
+					docker client is actually communicating with the docker daemon here [docker_architecture.png]
+				docker pull ubuntu:14.04	# Pull down an image from the Docker Hub registry's ubuntu repository with a "14.04" tag
+					Registry
+					Repository
+					Tag
+				docker images			# We now have a local copy of the ubuntu:14.04 image in our local cache - one off
+				docker history ubuntu:14.04
+				docker info
+		Manually run a container
+			tmux - Split window
+			Window 1
+				docker run -t -i --name mycontainer ubuntu:14.04 bash
+					ps aux
+					cat /etc/passwd
+					whoami
+			Window 2
+				docker ps 
+			Window 1
+				ctrl-c
+				docker ps
+				docker ps -a
+				docker rm mycontainer
+				
+
+Run a container based on a Dockerfile
+	demo1/Dockerfile
+		** Different distro
+		** Different package management
+		** Volumes are outside of the container	
+	demo1/app.sh
+	demo1/run.sh
+		build - Explain how this works in terms of docker
+			Client creates tarball for local dir, this is the build context
+			Sends build context to daemon
+			Daemon pulls any required base images, runs instructions (Create container, run instruction, commit container for new image all in local cache)
+			Reports result - can see this with docker images\history\events
+
+
+Share a deployment image via the Docker Hub registry
+	demo2/Dockerfile
+		** No update so push will be small for demo
+		** Much the same as demo 1
+	demo2/app.sh
+		* Same as demo1
+	demo2/run.sh
+		** This time it pushes to Docker Hub
+		** Connect to AWS and show it running there
+			
+
+Run a mono app in a container
+	ec2name=ec2-54-172-65-200.compute-1.amazonaws.com
+	scp -r -i ~/.aws/pmcg_aws.pem mono ubuntu@$ec2name:~
+	ssh -i ~/.aws/pmcg_aws.pem ubuntu@$ec2name
+		docker build -t mymono:v1 mono
+		docker run -d --name mymonocontainer mymono:v1
+		docker logs -f mymonocontainer
+
+
+Volumes [http://www.tech-d.net/2014/11/03/docker-indepth-volumes/]
+	Need to store some data persistently - outside the containers lifetime
+		i.e Database files
+
+
+Networking
+	.
+	Ports
+
+
+Docker on bare metal
+	CoreOS [https://coreos.com/]
+	redhat atomic [http://www.projectatomic.io/]
+	Mixing VMs and containers i.e Running docker within a VM - Will be mixing the two 
+		Can help with the security issues [docker_mix_vms_and_containers.png]
+
+
+Multi host management - orchestration\scheduling work
+	fig [http://www.fig.sh/]
+	Kubernetes [https://github.com/GoogleCloudPlatform/kubernetes]
+	fleet [https://coreos.com/using-coreos/clustering/]
+	flynn [https://flynn.io/]
+	etc. [http://www.quora.com/What-is-the-best-Docker-Linux-Container-orchestration-tool]
+
+
+Sample use cases
+	Shared development environments
+		Platform decision
+			Distro
+			Programming language stacks
+			Servers
+		Dependencies
+			Library dependencies
+		Develop application
+			Binary\Source
+		Staging
+			Make exact instance available to a qa\staging environment
+		Deploy to production
+			Make exact instance available to a prod environment
+	Experimenting with new s/w without installing on your machine i.e. Redis, new version of Java
+	Exploring how s/w is installed - dependencies etc. can read the Dockerfile's on github
+	Very fast development feedback cycles
+		Creation and discarding of containers
+		Dockerfile failures - stop at the failed instruction so you can restart from there after fixing the problem
+	Run various services in containers (CI\CD with additional slave containers)
+		Lots of talk about potential with microservice architectures
+	Run cross platform tests for your s/w in multiple disposable containers
+	Run short jobs
+		Google starts > 1 billion containers a day
+		Scrape some content and store on a schedule - Once a day, many instances
+	 
+
+Some links to start with
+	https://www.docker.com/whatisdocker/						Watch video introduction by one of docker creators
+	http://www.dockerbook.com/							Book
+	http://intelstudios.edgesuite.net/idf/2014/sf/aep/DATS004/DATS004.html		Really good explanation 
+	https://www.youtube.com/watch?v=68lmfNmktjY					Good video but need to be somewhat familiar with docker
+	https://docs.docker.com/							Docs
+	http://blog.docker.com/docker-weekly-archives/					Weekly newsletter
+	https://github.com/docker/docker						Source, should also look at all repos for the docker organisation
+
