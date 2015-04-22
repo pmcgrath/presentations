@@ -16,7 +16,7 @@
 
 ## Origin
 - Linux issue
-- OSS
+- Open source
 - Is cross platform (See https://msysgit.github.io/ for windows)
 
 ## Compare to centralised VCS
@@ -64,7 +64,7 @@ cat ~/.gitconfig
 >[user]
 >	email = pmcgrath@gmail.com
 >	name = pmcgrath
-```bash
+```
 - Can add Windows line endings settings - CRLF v LF
 - Can add aliases etc.
 
@@ -148,12 +148,14 @@ Can now start thinking of it has an immutable database that you can query
 ## There are alternatives 
 bitbucket, gitlab, UNC share
 
-## Social coding - Share\collobarate etc
+## Social coding
+Share\collobarate etc
 
 ## Issues 
 - github DDOS outages
 - Placing all your data with one provider (Same concerns as email - gmail, hotmail)
 - Sensitive data - need controls to ensure no sensitive data placed on web - History makes available to any searches
+
 
 # Services around hosting git repositories
 - Hosted on web or can pay for github enterprise for on premise service
@@ -170,13 +172,17 @@ bitbucket, gitlab, UNC share
 - Gists
 - REST API to access these features
 
-# OSS
+
+# Open source content
 - Most content seems to be moving here 
+
 
 # Accessed primarily with 2 protocols
 - https 
 - ssh
+
 Accessed differently depending on just cloning or planning to contribute
+
 
 # Demo
 - Create github account
@@ -187,6 +193,7 @@ Accessed differently depending on just cloning or planning to contribute
 - Push content
 - Clone to a different location and repeat
 - git log in both locations
+
 
 # Show a pull request
 ```bash
@@ -245,5 +252,4 @@ git log
 - git protocols							http://git-scm.com/book/ch4-1.html
 - github ssh configuration					https://help.github.com/articles/generating-ssh-keys/
 - Manage github pull request from shell (Many others)		https://github.com/docker/gordon
-- How do i ...?							google - never found a question we couldn't get an answer to
-								youtube
+- How do I ...?							google and youtube - never found a question we couldn't get an answer to
