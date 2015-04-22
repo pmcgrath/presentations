@@ -35,19 +35,20 @@
 
 
 # Installation
-- See http://www.git-scm.com/
-- This is the original c based implementation, but there are many other implementations and libraries (See http://en.wikipedia.org/wiki/Git_%28software%29#Implementations)
+See http://www.git-scm.com/
 
-- Windows
-At this time the latest version is v1.9.5 as opposed to the source version v2.3.5
- - Manual install
-  - http://www.git-scm.com/download/win
- - GUI installs
-  -http://www.git-scm.com/downloads/guis
- - chocolatey
-  - https://chocolatey.org/packages/git
+This is the original c based implementation, but there are many other implementations and libraries (See http://en.wikipedia.org/wiki/Git_%28software%29#Implementations)
 
-- Linux ubuntu - tracking latest
+## Windows 
+(At this time the latest version is v1.9.5 as opposed to the source version v2.3.5)
+- Manual install
+ - http://www.git-scm.com/download/win
+- GUI installs
+ - http://www.git-scm.com/downloads/guis
+- chocolatey
+ - https://chocolatey.org/packages/git
+
+## Linux ubuntu - tracking latest
 ```bash
 sudo add-apt-repository ppa:git-core/ppa -y                                                                                                                      
 sudo apt-get update                                                                                                                                              
