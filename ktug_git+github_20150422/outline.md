@@ -23,7 +23,7 @@
 - Subversion
 - You control your own repository
  - Private repositories
- - No network connection required			
+ - No network connection required
  - Fast branches - Just creates a file
  - Local merging - fetch remote branch and work from there
  - Your own private branches
@@ -50,8 +50,8 @@ This is the original c based implementation, but there are many other implementa
 
 ## Linux ubuntu - tracking latest
 ```bash
-sudo add-apt-repository ppa:git-core/ppa -y                                                                                                                      
-sudo apt-get update                                                                                                                                              
+sudo add-apt-repository ppa:git-core/ppa  -y
+sudo apt-get update
 sudo apt-get install git -y 
 ```
 
@@ -245,6 +245,7 @@ git log
 # Resources
 - Main git website						http://git-scm.com/
 - Free online git book						http://git-scm.com/book/en/v2
+- Try git							https://try.github.io/
 - Git workflows (Search for alternatives)			https://www.atlassian.com/git/tutorials/comparing-workflows/centralized-workflow
 - github							https://github.com/
 - Good alternative to github					https://bitbucket.org/
