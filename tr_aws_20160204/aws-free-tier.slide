@@ -1,0 +1,138 @@
+Amazon Web Services free tier
+
+
+
+* Agenda
+- Brief overview
+- Setup 
+- Billing alerts
+- What you get
+- VPC, DBs, S3, IAM
+- EC2 demo
+- Automation
+- Charges
+- Some links to get started with
+
+
+
+* Brief overview
+- List of services
+- IASS
+- Services
+	- SES, SQS etc.
+- EC2
+- ELB and autoscaling groups
+- S3
+- DBs - RDS, ElastiCache DynamoDB
+- ECS
+- Availability of services https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
+
+
+
+* Setup 
+- See https://aws.amazon.com/free/
+- Will need an email address
+- Will need to give a credit\debit card
+- Will need to give a mobile number which will receive a code to complete the signup
+
+
+
+* Billing alerts
+- You should setup a billing alert as soon as you sign up
+  - https://forums.aws.amazon.com/thread.jspa?threadID=219204
+  - http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/checklistforunwantedcharges.html
+- Can use instructions from here http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-alarms.html
+
+
+
+* What you get
+- See http://aws.amazon.com/free/
+- EC2
+	- 750 hours a month
+	- Charge is per the hour - start for 1 minutes and you get charged for the hour
+	- Running many at the same time
+		- Could run 750 instances for 1 hour and stop all for the rest of the month and I belive you are within the limit
+	- Instance
+		- Class
+		- vCPU
+		- RAM
+		- Disk - SSD, PIOPS
+		- What if you use larger sizes - Guessing you get billed
+
+
+
+* VPC
+- Region
+- Availability Zone
+- Subnet
+- How many can you have
+- Default VPC
+	- Will include a number of subnets in a number of avail
+	- EC2 instances will be given DNS entries and public IPs
+
+
+
+* DBs
+- https://aws.amazon.com/free/databases-free-tier/:w
+
+- RDS
+- DynamoDB
+- RedShift
+
+
+
+* S3
+- Storage with permissions
+
+
+
+* IAM
+- Users\groups\roles etc
+- Root account
+- Alias for logging into the console
+- Create an admin IAM user and never login with root account
+- Can use MFA - SMS comming
+
+
+
+* AWS account limits
+- http://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html
+
+
+
+* EC2 demo
+- Launch instance
+- Windows\Linux\Dave's unikernel
+	- AMI
+	- PKI keys
+		- chmod keyfile
+	- User data
+	- EBS
+	- Connect
+	- Stop\Terminate
+		- EBS
+		- State
+
+
+
+* Automation
+- UI\CloudFormation\Elastic Beanstalk
+- CLI see here for some info http://stash/projects/TOK/repos/aws_inv/browse/setup.md
+
+
+
+* Charges
+- EC2 see https://aws.amazon.com/ec2/pricing/
+- Online calculator https://awstcocalculator.com/
+- Dave and Naresh have done some calculations
+
+
+
+* Links
+- Youtube channel - https://www.youtube.com/user/AmazonWebServices
+	- re:Invent
+- Documentation - https://aws.amazon.com/documentation/ 
+- Pluralsight course - https://www.pluralsight.com/courses/aws-certified-sysops-admin-associate
+
+
+
