@@ -37,7 +37,7 @@ data "aws_availability_zones" "available" {}
 
 # Outputs
 output "nat_gateway_public_ip" {
-  value = "aws_eip.nat.public_ip}"
+  value = "${aws_eip.nat.public_ip}"
 }
 
 # Configure the AWS Provider - Will only set the region - do not want to commit access keys to SCM - that would be expensive
@@ -103,15 +103,7 @@ resource "aws_security_group" "app" {
     to_port   = 22
     protocol  = "tcp"
 
-    security_group_ids = ["${aws_security_group.bastion.id}"]
-  }
-
-  ingress {
-    from_port = 5000
-    to_port   = 5000
-    protocol  = "tcp"
-
-    security_group_ids = ["${aws_security_group.webfront.id}"]
+    security_groups = ["${aws_security_group.bastion.id}"]
   }
 }
 
@@ -124,7 +116,7 @@ resource "aws_security_group" "bastion" {
     to_port   = 22
     protocol  = "tcp"
 
-    security_group_ids = ["${aws_security_group.app.id}", "${aws_security_group.webfront.id}"]
+    cidr_blocks = ["${var.vpc_cidr_block}"]
   }
 
   ingress {
@@ -132,7 +124,7 @@ resource "aws_security_group" "bastion" {
     to_port   = 22
     protocol  = "tcp"
 
-    cidr_blocks = ["${var.my_ip_cidr_block}"]
+    cidr_blocks = ["${var.bastion_ssh_access_cidr_block}"]
   }
 }
 
@@ -140,20 +132,12 @@ resource "aws_security_group" "webfront" {
   vpc_id = "${aws_vpc.main.id}"
   name   = "${var.vpc_name}-webfront"
 
-  egress {
-    from_port = 5000
-    to_port   = 5000
-    protocol  = "tcp"
-
-    security_group_ids = ["${aws_security_group.app.id}"]
-  }
-
   ingress {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
 
-    security_group_ids = ["${aws_security_group.bastion.id}"]
+    security_groups = ["${aws_security_group.bastion.id}"]
   }
 
   ingress {
@@ -163,6 +147,26 @@ resource "aws_security_group" "webfront" {
 
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# See https://www.terraform.io/docs/providers/aws/r/security_group_rule.html
+# Cannot inline some of these due to cyclic issues, so need to extract
+resource "aws_security_group_rule" "app_ingress_webfront_5000" {
+  type                     = "ingress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.app.id}"
+  source_security_group_id = "${aws_security_group.webfront.id}"
+}
+
+resource "aws_security_group_rule" "webfront_egress_app_5000" {
+  type                     = "egress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.webfront.id}"
+  source_security_group_id = "${aws_security_group.app.id}"
 }
 
 # See https://www.terraform.io/docs/providers/aws/r/subnet.html
@@ -200,7 +204,7 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
-variable "my_ip_cidr_block" {}
+variable "bastion_ssh_access_cidr_block" {}
 
 variable "private_subnet_cidr_block" {
   default = "10.0.1.0/24"

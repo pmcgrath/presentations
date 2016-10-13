@@ -2,8 +2,8 @@
 # Order is based on the usual lifecycle
 
 
-# Some tasks need my IP as a CIDR block, so I will export
-export TF_VAR_my_ip_cidr_block=$(dig +short myip.opendns.com @resolver1.opendns.com)/32
+# Some tasks need my IP as a CIDR block for bastion ssh access, so I will export
+export TF_VAR_bastion_ssh_access_cidr_block=$(shell dig +short myip.opendns.com @resolver1.opendns.com)/32
 
 
 check:
@@ -12,6 +12,7 @@ check:
 
 
 plan:
+	@echo $$TF_VAR_bastion_ssh_access_cidr_block
 	@terraform plan
 
 
