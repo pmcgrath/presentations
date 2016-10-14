@@ -20,14 +20,20 @@
 			- App
 				- 22 from Bastion SG
 				- 5000 from WebFront SG
+				- 80 to 0.0.0.0/0
+				- 443 to 0.0.0.0/0
 			- Bastion
 				- 22 from my IP
 				- 22 to WebFront SG
 				- 22 to App SG
+				- 80 to 0.0.0.0/0
+				- 443 to 0.0.0.0/0
 			- WebFront
 				- 22 from Bastion SG
 				- 80 from internet
 				- 5000 to App SG
+				- 80 to 0.0.0.0/0
+				- 443 to 0.0.0.0/0
 
 		Did not bother with NACLs - just allowed the subnets to default to the default NACL created when the VPC was created
 */
@@ -95,21 +101,31 @@ resource "aws_route_table" "nat" {
 
 # See https://www.terraform.io/docs/providers/aws/r/security_group.html
 resource "aws_security_group" "app" {
-  vpc_id = "${aws_vpc.main.id}"
-  name   = "${var.vpc_name}-app"
+  description = "Apps"
+  vpc_id      = "${aws_vpc.main.id}"
+  name        = "${var.vpc_name}-app"
 
-  ingress {
-    from_port = 22
-    to_port   = 22
+  egress {
+    from_port = 80
+    to_port   = 80
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.bastion.id}"]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_security_group" "bastion" {
-  vpc_id = "${aws_vpc.main.id}"
-  name   = "${var.vpc_name}-bastion"
+  description = "Bastions"
+  vpc_id      = "${aws_vpc.main.id}"
+  name        = "${var.vpc_name}-bastion"
 
   egress {
     from_port = 22
@@ -117,6 +133,22 @@ resource "aws_security_group" "bastion" {
     protocol  = "tcp"
 
     cidr_blocks = ["${var.vpc_cidr_block}"]
+  }
+
+  egress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -129,16 +161,9 @@ resource "aws_security_group" "bastion" {
 }
 
 resource "aws_security_group" "webfront" {
-  vpc_id = "${aws_vpc.main.id}"
-  name   = "${var.vpc_name}-webfront"
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-
-    security_groups = ["${aws_security_group.bastion.id}"]
-  }
+  description = "Web frontends"
+  vpc_id      = "${aws_vpc.main.id}"
+  name        = "${var.vpc_name}-webfront"
 
   ingress {
     from_port = 80
@@ -147,10 +172,35 @@ resource "aws_security_group" "webfront" {
 
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 # See https://www.terraform.io/docs/providers/aws/r/security_group_rule.html
 # Cannot inline some of these due to cyclic issues, so need to extract
+resource "aws_security_group_rule" "app_ingress_bastion_22" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.app.id}"
+  source_security_group_id = "${aws_security_group.bastion.id}"
+}
+
 resource "aws_security_group_rule" "app_ingress_webfront_5000" {
   type                     = "ingress"
   from_port                = 5000
@@ -167,6 +217,15 @@ resource "aws_security_group_rule" "webfront_egress_app_5000" {
   protocol                 = "tcp"
   security_group_id        = "${aws_security_group.webfront.id}"
   source_security_group_id = "${aws_security_group.app.id}"
+}
+
+resource "aws_security_group_rule" "webfront_ingress_bastion_22" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.webfront.id}"
+  source_security_group_id = "${aws_security_group.bastion.id}"
 }
 
 # See https://www.terraform.io/docs/providers/aws/r/subnet.html
