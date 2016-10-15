@@ -67,7 +67,8 @@ resource "aws_eip" "nat_gateway" {
 
 # See https://www.terraform.io/docs/providers/aws/r/internet_gateway.html
 resource "aws_internet_gateway" "main" {
-  vpc_id = "${aws_vpc.main.id}"
+  vpc_id               = "${aws_vpc.main.id}"
+  enable_dns_hostnames = true
 
   tags {
     Name = "${var.vpc_name}-internet-gateway"
