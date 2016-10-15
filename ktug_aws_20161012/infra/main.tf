@@ -130,7 +130,7 @@ resource "aws_security_group" "webfront" {
 }
 
 # See https://www.terraform.io/docs/providers/aws/r/security_group_rule.html
-# Cannot inline some of these due to cyclic issues, also warns about mixing inline and external rules, so need to extract all
+# Cannot inline some of these in the security groups due to cyclic issues, also warns about mixing inline and external rules, so need to extract all
 resource "aws_security_group_rule" "app_egress_all_80" {
   type              = "egress"
   from_port         = 80
@@ -147,6 +147,15 @@ resource "aws_security_group_rule" "app_egress_all_443" {
   protocol          = "tcp"
   security_group_id = "${aws_security_group.app.id}"
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "app_ingress_bastion_22" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.app.id}"
+  source_security_group_id = "${aws_security_group.bastion.id}"
 }
 
 resource "aws_security_group_rule" "app_ingress_webfront_5000" {
@@ -273,7 +282,7 @@ resource "aws_subnet" "public" {
 
 # See https://www.terraform.io/docs/providers/aws/r/vpc.html
 resource "aws_vpc" "main" {
-  cidr_block = "${var.vpc_cidr_block}"
+  cidr_block           = "${var.vpc_cidr_block}"
   enable_dns_hostnames = true
 
   tags {
