@@ -52,9 +52,9 @@ aws --version
 sudo apt-get install -y unzip
 
 # Alter version for the current version and grab binary, extracting into /usr/local/bin - Is a single binary
-version=0.10.1
+version=0.10.2
 wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/${version}/packer_${version}_linux_amd64.zip
-sudo unzip /tmp/packer.zip -d /usr/local/bin
+sudo unzip -o /tmp/packer.zip -d /usr/local/bin
 
 # Check version
 packer version
@@ -68,9 +68,9 @@ packer version
 sudo apt-get install -y unzip
 
 # Alter version for the current version and grab binary, extracting into /usr/local/bin - Is a single binary since 0.7.0
-version=0.7.3
+version=0.7.6
 wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip
-sudo unzip /tmp/terraform.zip -d /usr/local/bin
+sudo unzip -o /tmp/terraform.zip -d /usr/local/bin
 
 # Check version
 terraform version
