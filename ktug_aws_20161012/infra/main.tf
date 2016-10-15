@@ -67,8 +67,7 @@ resource "aws_eip" "nat_gateway" {
 
 # See https://www.terraform.io/docs/providers/aws/r/internet_gateway.html
 resource "aws_internet_gateway" "main" {
-  vpc_id               = "${aws_vpc.main.id}"
-  enable_dns_hostnames = true
+  vpc_id = "${aws_vpc.main.id}"
 
   tags {
     Name = "${var.vpc_name}-internet-gateway"
@@ -83,23 +82,14 @@ resource "aws_nat_gateway" "main" {
   depends_on    = ["aws_internet_gateway.main"]
 }
 
-# See https://www.terraform.io/docs/providers/aws/r/route.html
-resource "aws_route" "internet" {
-  route_table_id         = "${aws_route_table.internet.id}"
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.main.id}"
-}
-
-resource "aws_route" "nat" {
-  count                  = "${var.availability_zone_count}"
-  route_table_id         = "${aws_route_table.nat.*.id[count.index]}"
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = "${aws_nat_gateway.main.*.id[count.index]}"
-}
-
-# See https://www.terraform.io/docs/providers/aws/r/route.html
+# See https://www.terraform.io/docs/providers/aws/r/route_table.html
 resource "aws_route_table" "internet" {
   vpc_id = "${aws_vpc.main.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.main.id}"
+  }
 
   tags {
     Name = "${var.vpc_name}-internet"
@@ -109,6 +99,11 @@ resource "aws_route_table" "internet" {
 resource "aws_route_table" "nat" {
   count  = "${var.availability_zone_count}"
   vpc_id = "${aws_vpc.main.id}"
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = "${aws_nat_gateway.main.*.id[count.index]}"
+  }
 
   tags {
     Name = "${var.vpc_name}-nat-${count.index}"
@@ -279,6 +274,7 @@ resource "aws_subnet" "public" {
 # See https://www.terraform.io/docs/providers/aws/r/vpc.html
 resource "aws_vpc" "main" {
   cidr_block = "${var.vpc_cidr_block}"
+  enable_dns_hostnames = true
 
   tags {
     Name = "${var.vpc_name}"
