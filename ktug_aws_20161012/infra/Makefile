@@ -11,12 +11,12 @@ check:
 	@terraform fmt
 
 
-plan:
+plan: check
 	@echo $$TF_VAR_bastion_ssh_access_cidr_block
 	@terraform plan
 
 
-apply:
+apply: check
 	@terraform apply
 
 
