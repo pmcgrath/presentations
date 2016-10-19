@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+# Version
+aws --version
+
+# Auto completion
+aws TAB TAB
+aws ec2 TAB TAB
+
+# List all users
+aws iam list-users
+
+# List VPCs
+aws ec2 describe-vpcs

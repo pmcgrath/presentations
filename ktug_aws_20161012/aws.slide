@@ -1,0 +1,178 @@
+Infrastructure as code on AWS 
+
+October 2016
+
+
+
+* Outline
+- Setup
+ AWS CLI
+ jq
+ Packer
+ Terraform
+- CLI demo
+- Terraform demo
+
+
+
+* Before we begin
+- Will not cover the following due to time
+	- AMI creation
+	- Instance creation
+- Can over those in an another session
+- Don't get too worried about the details
+	- Just get the concepts
+	- Can revisit in your own time
+
+
+
+* AWS CLI 
+- See http://docs.aws.amazon.com/cli/latest/
+- Python app which wraps boto3 SDK, see https://github.com/boto/boto3
+- Web service calls with signatures
+- Organised into command and sub commands
+.code scripts/install-aws-cli.sh
+
+
+
+* AWS autocompletion
+- Add to bashrc - dependent on dotfile management
+.code scripts/configure-aws-completer.sh
+
+
+
+* jq installation
+- See https://stedolan.github.io/jq/manual
+- Manipulate json output - select and project/generate
+- c binary so can run on windows also
+.code scripts/install-jq.sh
+
+
+
+* Packer
+- See https://www.packer.io
+- Build AWS AMIs, Azure, VirtualBox VMs etc.
+.code scripts/install-packer.sh
+
+
+
+* Terraform
+- See https://www.terraform.io
+- Infrastruture as code
+- Multiple cloud providers
+.code scripts/install-terraform.sh
+
+
+
+* CLI demo
+- DO NOT DELETE YOUR DEFAULT VPC - Here lies pain
+- AWS access key
+- Generate AWS access keys for an account user with admin privileges
+- See http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html
+- Don't bother downloading file, just paste as instructed below
+- Using a profile - can have many and switch between them (Special case is the default profile)
+
+
+
+* Profile
+.code samples/configure-local-aws-profile.sh.sample
+
+
+
+* Just use env vars
+.code samples/configure-aws-env-vars.sh.sample
+
+
+
+* CLI simple queries
+.code samples/cli-demo-queries.sh.sample
+
+
+
+* CLI VPC CRUD demo
+.code samples/cli-demo-roundtrip-vpc.sh.sample
+
+
+
+* CLI notes
+- Could also use awshell, see https://github.com/awslabs/aws-shell
+- Other tools and SDKs will look for credentials using the same config
+	- Profile env var
+	- Env var values
+	- Explicit values in code
+
+
+
+* Terraform
+- See https://www.terraform.io/
+- Decalaritive infrastructure as code
+	- AWS networks
+	- IAM users\roles etc
+	- DynamoDB\SQS etc
+	- EC2\ECS instances
+- Providers one of which is AWS, see https://www.terraform.io/docs/providers/aws/index.html
+- No logic
+	- People build scripts\little tools above usage
+- Workflow is
+	- Plan
+	- Apply
+	- Destroy
+
+
+
+* Terraform - Create a VPC
+- Create a definition
+	- Single file - main.tf
+	- Can use multiple files
+	- Can use modules to reduce
+- Variables as input
+- Ouutput - can be input to other runs\systems
+
+
+
+* Terraform - Create a VPC definition - all one file here
+.code tf-vpc-simple/main.tf
+
+
+
+* Terraform - Create a VPC - plan
+terraform validate
+
+terraform plan
+	- Creation +
+	- Destruction -
+	- Alteration ~
+
+Graph where current state is compared to what you now want and diff is calculated
+
+
+
+* Terraform - Create a VPC - apply
+terraform apply
+
+- State file - local by default, but can be remote i.e. S3 
+- Outputs - terraform output vpc_id
+- Commit state file  - Can store remotely in S3 rather than in the local repo
+
+
+
+* Terraform - Create a VPC - update
+Alter the VPC name - will pass as a var
+
+terraform plan -var "vpc_name=ktug-1"
+
+terraform apply -var "vpc_name=ktug-1"
+
+
+
+* Terraform - Create a VPC - destroy
+terraform destroy
+
+- State file
+
+
+
+* Terraform - More realistic sample
+- VPC with 2 AZs with public subnets and private subnets
+- Demo so we see how long it takes
+

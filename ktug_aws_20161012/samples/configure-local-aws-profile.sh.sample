@@ -1,0 +1,18 @@
+# Ensure we have an .aws directory
+[ -d ~/.aws ] || echo mkdir ~/.aws
+
+# Set these, use space so not in your history
+ profile_name=ACCOUNT_NAME_USER_NAME
+ access_key_id=FILL_ME_IN
+ secret_access_key=FILL_ME_IN
+
+ cat >> ~/.aws/credentials <<EOF
+[$profile_name]
+aws_access_key_id = $access_key_id
+aws_secret_access_key = $secret_access_key
+EOF
+
+# Configure env to use the profile
+export AWS_PROFILE=FILL_ME_IN_IF_NOT_DEFAULT
+export AWS_REGION=eu-west-1
+export AWS_DEFAULT_REGION=eu-west-1

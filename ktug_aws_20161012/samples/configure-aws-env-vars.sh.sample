@@ -1,0 +1,5 @@
+# Use env vars instead of a profile - Close terminal\session all gone
+export AWS_ACCESS_KEY_ID=FILL_ME_IN
+export AWS_SECRET_ACCESS_KEY=FILL_ME_IN
+export AWS_REGION=eu-west-1
+export AWS_DEFAULT_REGION=eu-west-1

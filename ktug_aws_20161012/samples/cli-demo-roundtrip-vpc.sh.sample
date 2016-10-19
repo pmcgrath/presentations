@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+# Create A VPC, capturing the Id using jq
+VPC_ID=$(aws ec2 create-vpc --cidr-block 10.240.0.0/16 | jq -r '.Vpc.VpcId')
+
+# Tag the VPC
+aws ec2 create-tags --resources $VPC_ID --tags Key=Name,Value=ted
+
+# List VPCs
+aws ec2 describe-vpcs
+
+# Delete the VPC
+aws ec2 delete-vpc --vpc-id $VPC_ID
+
+# List VPCs
+aws ec2 describe-vpcs
