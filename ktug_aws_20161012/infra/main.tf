@@ -16,6 +16,7 @@
 		N + 1 route tables
 			- Public that has a 0.0.0.0/0 route via the internet gateway
 			- N Private that has a 0.0.0.0/0 route via the NAT gateways where N is the var.availability_zone_count value
+		N + 1 route table associations - subnets to route tables
 		3 security groups
 			- App
 				- 22 from Bastion SG
@@ -76,10 +77,10 @@ resource "aws_internet_gateway" "main" {
 
 # See https://www.terraform.io/docs/providers/aws/r/nat_gateway.html
 resource "aws_nat_gateway" "main" {
-  count         = "${var.availability_zone_count}"
   allocation_id = "${aws_eip.nat_gateway.*.id[count.index]}"
-  subnet_id     = "${aws_subnet.public.*.id[count.index]}"
+  count         = "${var.availability_zone_count}"
   depends_on    = ["aws_internet_gateway.main"]
+  subnet_id     = "${aws_subnet.public.*.id[count.index]}"
 }
 
 # See https://www.terraform.io/docs/providers/aws/r/route_table.html
@@ -110,23 +111,36 @@ resource "aws_route_table" "nat" {
   }
 }
 
+# See https://www.terraform.io/docs/providers/aws/r/route_table_association.html
+resource "aws_route_table_association" "private" {
+  count          = "${var.availability_zone_count}"
+  route_table_id = "${aws_route_table.nat.*.id[count.index]}"
+  subnet_id      = "${aws_subnet.private.*.id[count.index]}"
+}
+
+resource "aws_route_table_association" "public" {
+  count          = "${var.availability_zone_count}"
+  route_table_id = "${aws_route_table.internet.id}"
+  subnet_id      = "${aws_subnet.public.*.id[count.index]}"
+}
+
 # See https://www.terraform.io/docs/providers/aws/r/security_group.html
 resource "aws_security_group" "app" {
   description = "Apps"
-  vpc_id      = "${aws_vpc.main.id}"
   name        = "${var.vpc_name}-app"
+  vpc_id      = "${aws_vpc.main.id}"
 }
 
 resource "aws_security_group" "bastion" {
   description = "Bastions"
-  vpc_id      = "${aws_vpc.main.id}"
   name        = "${var.vpc_name}-bastion"
+  vpc_id      = "${aws_vpc.main.id}"
 }
 
 resource "aws_security_group" "webfront" {
   description = "Web frontends"
-  vpc_id      = "${aws_vpc.main.id}"
   name        = "${var.vpc_name}-webfront"
+  vpc_id      = "${aws_vpc.main.id}"
 }
 
 # See https://www.terraform.io/docs/providers/aws/r/security_group_rule.html
@@ -259,9 +273,9 @@ resource "aws_security_group_rule" "webfront_inress_all_443" {
 
 # See https://www.terraform.io/docs/providers/aws/r/subnet.html
 resource "aws_subnet" "private" {
-  count             = "${var.availability_zone_count}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   cidr_block        = "${var.private_subnet_cidr_blocks[count.index]}"
+  count             = "${var.availability_zone_count}"
   vpc_id            = "${aws_vpc.main.id}"
 
   tags {
@@ -270,10 +284,11 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_subnet" "public" {
-  count             = "${var.availability_zone_count}"
-  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  cidr_block        = "${var.public_subnet_cidr_blocks[count.index]}"
-  vpc_id            = "${aws_vpc.main.id}"
+  availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
+  cidr_block              = "${var.public_subnet_cidr_blocks[count.index]}"
+  count                   = "${var.availability_zone_count}"
+  map_public_ip_on_launch = true
+  vpc_id                  = "${aws_vpc.main.id}"
 
   tags {
     Name = "${var.vpc_name}-public-${count.index}"
