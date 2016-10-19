@@ -156,6 +156,20 @@ terraform apply
 
 
 
+* Terraform - Create a VPC - plan
+terraform plan
+
+- Should have nothing to do as statefile matches the actual state
+
+
+
+* Terraform - Create a VPC - apply again
+terraform apply
+
+- Should have nothing to do as statefile matches the actual state
+
+
+
 * Terraform - Create a VPC - update
 Alter the VPC name - will pass as a var
 
